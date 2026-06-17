@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>pey only 🩷🌸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            height: 100vh;
+            height: -webkit-fill-available; 
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            background: linear-gradient(to bottom, #05020f, #12041b, #05010a);
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* --- ONE-TAP SCREEN OVERLAY (WALANG BUTTONS) --- */
+        #welcomeOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #05020f, #0f0318);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .enter-text {
+            color: #ff9ff3;
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-align: center;
+            animation: pulse 1.5s infinite alternate;
+        }
+
+        .enter-subtext {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        .glow-bg {
+            position: absolute;
+            width: 150vw;
+            height: 80vh;
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, rgba(0,0,0,0) 70%);
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* --- TEXT SA TAAS --- */
+        .name-banner {
+            position: absolute;
+            top: 14%;
+            width: 100%;
+            text-align: center;
+            z-index: 10;
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        .loaded .name-banner {
+            animation: show-name 2s cubic-bezier(0.34, 1.56, 0.64, 1) 4.5s forwards;
+        }
+
+        .name-text {
+            font-size: 2.0rem;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 0 10px #ff7eb3, 0 0 20px #ff758c, 0 0 40px #8b5cf6;
+            letter-spacing: 3px;
+            display: inline-block;
+            animation: bounce-sway 4s ease-in-out infinite alternate;
+        }
+
+        /* --- MGA IBON (FIXED FLAPPING) --- */
+        .birds-container {
+            position: absolute;
+            top: 5%;
+            width: 100%;
+            height: 120px;
+            z-index: 8;
+            pointer-events: none;
+            opacity: 0;
+        }
+        .loaded .birds-container { opacity: 1; transition: opacity 2s ease 4.5s; }
+
+        .bird {
+            position: absolute;
+            width: 18px;
+            height: 10px;
+            display: flex;
+        }
+        .bird::before, .bird::after {
+            content: '';
+            flex: 1;
+            height: 100%;
+            border: 2px solid #ff9ff3;
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+        }
+        .bird::before { border-right: none; transform-origin: right bottom; animation: wing-flap-left 0.2s ease-in-out infinite alternate; }
+        .bird::after { border-left: none; transform-origin: left bottom; animation: wing-flap-right 0.2s ease-in-out infinite alternate; }
+
+        #bird1 { top: 15px; animation: fly-left-right 14s linear infinite; }
+        #bird2 { top: 45px; animation: fly-right-left 16s linear infinite; }
+        #bird3 { top: 75px; animation: fly-left-right 11s linear infinite 3s; }
+
+        /* --- THE GARDEN --- */
+        .garden {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 2;
+            padding-bottom: 25px;
+        }
+
+        .soil-container {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40px;
+            z-index: 5;
+        }
+
+        .soil {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 25px;
+            background: linear-gradient(to top, #020005, #0d0414);
+            border-top: 2px solid #1f0d30;
+        }
+
+        .grass-layer {
+            position: absolute;
+            bottom: 18px;
+            width: 100%;
+            height: 30px;
+            display: flex;
+            justify-content: space-around;
+            pointer-events: none;
+        }
+
+        .grass {
+            width: 4px;
+            height: 26px;
+            background: linear-gradient(to top, #0d2118, #22523c, #40916c);
+            border-radius: 4px 4px 0 0;
+            transform-origin: bottom center;
+            animation: grass-sway 3s ease-in-out infinite alternate;
+        }
+        .grass:nth-child(2n) { animation-duration: 2.2s; transform: rotate(6deg); height: 30px; }
+        .grass:nth-child(3n) { animation-duration: 3.2s; transform: rotate(-8deg); height: 23px; }
+        .grass-layer.front { bottom: 22px; opacity: 0.9; filter: brightness(1.25); }
+
+        /* --- 5 FLOWERS ARRANGEMENT --- */
+        .flowers-group {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            width: 100%;
+            height: 60vh;
+            max-height: 430px;
+            gap: 10px;
+            padding: 0 5px;
+        }
+
+        .flower-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .flower-container.main { width: 110px; height: 100%; z-index: 4; }
+        .flower-container.side { width: 65px; height: 70%; z-index: 2; opacity: 0.8; }
+        .flower-container.outer { height: 55%; z-index: 1; opacity: 0.65; }
+
+        .stem {
+            position: relative;
+            width: 5px;
+            height: 0%; 
+            background: linear-gradient(to right, #0f291d, #2d6a4f, #0f291d);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+        }
+        .loaded .stem { animation: grow-stem 3.5s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        .f-center .stem { animation-delay: 0s; }
+        .f-left1 .stem  { animation-delay: 0.3s; }
+        .f-right1 .stem { animation-delay: 0.5s; }
+        .f-left2 .stem  { animation-delay: 0.7s; }
+        .f-right2 .stem { animation-delay: 0.9s; }
+
+        .leaf {
+            position: absolute;
+            width: 26px;
+            height: 15px;
+            background: linear-gradient(to bottom left, #2d6a4f, #07120d);
+            border-radius: 0 25px 0 25px;
+            opacity: 0;
+        }
+        .leaf.left { left: -23px; bottom: 35%; transform-origin: right bottom; }
+        .leaf.right { right: -23px; bottom: 55%; transform-origin: left bottom; }
+        .loaded .leaf.left { animation: bloom-leaf-left 1.2s ease-out 1.5s forwards; }
+        .loaded .leaf.right { animation: bloom-leaf-right 1.2s ease-out 2s forwards; }
+
+        .flower-head {
+            position: absolute;
+            top: 0;
+            transform: translateY(-50%) scale(0);
+            width: 105px;
+            height: 105px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .flower-container.side .flower-head { width: 65px; height: 65px; }
+        .loaded .flower-head { animation: bloom-head 2.4s cubic-bezier(0.34, 1.3, 0.64, 1) 2.5s forwards; }
+        
+        .f-center .flower-head { animation-delay: 2.5s; }
+        .f-left1 .flower-head  { animation-delay: 2.8s; }
+        .f-right1 .flower-head { animation-delay: 3.0s; }
+        .f-left2 .flower-head  { animation-delay: 3.2s; }
+        .f-right2 .flower-head { animation-delay: 3.4s; }
+
+        /* --- ANG GITNA NG PETALS (NGAYON AY GUMAGAMIT NA NG <img>) --- */
+        .center-img-holder {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            z-index: 4;
+            box-shadow: 0 0 12px rgba(255, 159, 67, 0.8);
+            border: 2px solid #ff9f43;
+            background-color: #ff9f43; /* Kulay orange-gold pansamantala habang walang pic */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Sigurado tayong bilog at saktong-sakto ang <img> sa loob ng petals */
+        .center-img-holder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .flower-container.side .center-img-holder {
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, #fff3d1 0%, #e67e22 100%);
+            border: none;
+            box-shadow: none;
+        }
+
+        .petals {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            animation: float-sway 5s ease-in-out infinite alternate;
+        }
+
+        .petal {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 34px;
+            height: 54px;
+            background: linear-gradient(to top, #ee5253 0%, #f368e0 45%, #ff9ff3 85%, #ffffff 100%);
+            border-radius: 50% 50% 50% 50% / 35% 35% 65% 65%;
+            transform-origin: 50% 0%; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15), inset 0 -3px 8px rgba(238, 82, 83, 0.3);
+        }
+        .flower-container.side .petal {
+            width: 20px;
+            height: 32px;
+            background: linear-gradient(to top, #8b5cf6 0%, #ec4899 65%, #fbcfe8 100%);
+        }
+
+        /* 12 Petals Angles */
+        .petal:nth-child(1)  { transform: translate(-50%, -100%) rotate(0deg); }
+        .petal:nth-child(2)  { transform: translate(-50%, -100%) rotate(30deg); }
+        .petal:nth-child(3)  { transform: translate(-50%, -100%) rotate(60deg); }
+        .petal:nth-child(4)  { transform: translate(-50%, -100%) rotate(90deg); }
+        .petal:nth-child(5)  { transform: translate(-50%, -100%) rotate(120deg); }
+        .petal:nth-child(6)  { transform: translate(-50%, -100%) rotate(150deg); }
+        .petal:nth-child(7)  { transform: translate(-50%, -100%) rotate(180deg); }
+        .petal:nth-child(8)  { transform: translate(-50%, -100%) rotate(210deg); }
+        .petal:nth-child(9)  { transform: translate(-50%, -100%) rotate(240deg); }
+        .petal:nth-child(10) { transform: translate(-50%, -100%) rotate(270deg); }
+        .petal:nth-child(11) { transform: translate(-50%, -100%) rotate(300deg); }
+        .petal:nth-child(12) { transform: translate(-50%, -100%) rotate(330deg); }
+
+        .particle { position: absolute; border-radius: 50%; pointer-events: none; opacity: 0; }
+
+        /* --- BUTTERFLIES --- */
+        .butterfly-box { position: absolute; width: 24px; height: 24px; z-index: 4; transform-style: preserve-3d; opacity: 0; display: none; }
+        .loaded .butterfly-box { display: block; }
+
+        #b1 { animation: flight-path-1 10s linear infinite 4s; }
+        #b2 { animation: flight-path-2 13s linear infinite 4.5s; }
+        #b3 { animation: flight-path-3 8s linear infinite 5s; }
+
+        .butterfly { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transform: rotateX(55deg) rotateY(15deg); }
+        .wing { position: absolute; width: 12px; height: 16px; border-radius: 30% 70% 40% 60% / 40% 60% 30% 70%; }
+        #b1 .wing { background: linear-gradient(135deg, #00d2d3, #54a0ff); box-shadow: 0 0 6px #00d2d3; }
+        #b2 .wing { background: linear-gradient(135deg, #ff9ff3, #feca57); box-shadow: 0 0 6px #ff9ff3; }
+        #b3 .wing { background: linear-gradient(135deg, #ff6b6b, #ff8144); box-shadow: 0 0 6px #ff6b6b; }
+
+        .wing.left { left: 0; transform-origin: right center; animation: flap-left 0.1s ease-in-out infinite alternate; }
+        .wing.right { right: 0; transform-origin: left center; border-radius: 70% 30% 60% 40% / 60% 40% 70% 30%; animation: flap-right 0.1s ease-in-out infinite alternate; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes pulse { 0% { transform: scale(0.95); opacity: 0.7; } 100% { transform: scale(1.05); opacity: 1; } }
+        @keyframes bounce-sway { 0% { transform: translateY(0) rotate(-2deg); } 100% { transform: translateY(-6px) rotate(2deg); } }
+        @keyframes show-name { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes grow-stem { 0% { height: 0%; } 100% { height: 72%; } }
+        @keyframes bloom-leaf-left { 0% { opacity: 0; transform: scale(0) scaleX(-1) rotate(-20deg); } 100% { opacity: 1; transform: scale(1) scaleX(-1) rotate(15deg); } }
+        @keyframes bloom-leaf-right { 0% { opacity: 0; transform: scale(0) rotate(-20deg); } 100% { opacity: 1; transform: scale(1) rotate(15deg); } }
+        @keyframes bloom-head { 0% { transform: translateY(-50%) scale(0) rotate(0deg); } 100% { transform: translateY(-50%) scale(1) rotate(360deg); } }
+        @keyframes float-sway { 0% { transform: rotate(-2deg); } 100% { transform: rotate(2deg); } }
+        @keyframes grass-sway { 0% { transform: rotate(-4deg); } 100% { transform: rotate(8deg); } }
+        @keyframes particle-rise { 0% { transform: translateY(0) scale(0); opacity: 0; } 50% { opacity: 0.9; } 100% { transform: translateY(-110px) scale(1.2); opacity: 0; } }
+        @keyframes flap-left { 0% { transform: rotateY(-70deg); } 100% { transform: rotateY(20deg); } }
+        @keyframes flap-right { 0% { transform: rotateY(70deg); } 100% { transform: rotateY(-20deg); } }
+        @keyframes wing-flap-left { 0% { transform: rotateZ(-30deg); } 100% { transform: rotateZ(20deg); } }
+        @keyframes wing-flap-right { 0% { transform: rotateZ(30deg); } 100% { transform: rotateZ(-20deg); } }
+
+        @keyframes fly-left-right {
+            0% { left: -15%; transform: scale(0.55) translateY(0px); }
+            50% { transform: scale(0.55) translateY(-10px); }
+            100% { left: 115%; transform: scale(0.55) translateY(0px); }
+        }
+        @keyframes fly-right-left {
+            0% { left: 115%; transform: scaleX(-1) scale(0.5) translateY(0px); }
+            50% { transform: scaleX(-1) scale(0.5) translateY(10px); }
+            100% { left: -15%; transform: scaleX(-1) scale(0.5) translateY(0px); }
+        }
+
+        @keyframes flight-path-1 { 0% { opacity: 0; transform: translateX(-40px) translateY(-180px) rotate(0deg); } 5% { opacity: 1; } 100% { opacity: 0; transform: translateX(-40px) translateY(-180px) rotate(360deg); } }
+        @keyframes flight-path-2 { 0% { opacity: 0; transform: translateX(40px) translateY(-100px) rotate(180deg); } 10% { opacity: 1; } 100% { opacity: 0; transform: translateX(40px) translateY(-100px) rotate(540deg); } }
+        @keyframes flight-path-3 { 0% { opacity: 0; transform: translateX(-10px) translateY(-60px) rotate(360deg); } 5% { opacity: 1; } 100% { opacity: 0; transform: translateX(-10px) translateY(-60px) rotate(0deg); } }
+
+        @media screen and (max-width: 380px) {
+            .name-text { font-size: 1.2rem; }
+            .flowers-group { transform: scale(0.85); transform-origin: bottom center; gap: 4px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Isang tap lang sa screen para magbukas ang garden at mag-play ang music -->
+    <div id="welcomeOverlay" onclick="startGarden()" ontouchstart="startGarden()">
+        <div class="enter-text">tap screen pey</div>
+        <div class="enter-subtext">🌷💐</div>
+    </div>
+
+    <div class="glow-bg"></div>
+
+    <!-- Mga Ibon sa Taas -->
+    <div class="birds-container">
+        <div class="bird" id="bird1"></div>
+        <div class="bird" id="bird2"></div>
+        <div class="bird" id="bird3"></div>
+    </div>
+
+    <div class="name-banner">
+        <div class="name-text">🌷you're so pretty Pey 🫶</div>
+    </div>
+
+    <!-- Music Track -->
+    <audio id="bgMusic" loop src="self_aware.mp3"></audio>
+
+    <div class="garden">
+        <div class="flowers-group">
+            
+            <!-- FLOWER 1 (Outer Left) -->
+            <div class="flower-container side outer f-left2">
+                <div class="stem"><div class="leaf left"></div><div class="leaf right"></div><div class="flower-head"><div class="petals"><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div></div><div class="center-img-holder"></div></div></div>
+            </div>
+
+            <!-- FLOWER 2 (Inner Left) -->
+            <div class="flower-container side f-left1">
+                <div class="stem"><div class="leaf left"></div><div class="leaf right"></div><div class="flower-head"><div class="petals"><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div></div><div class="center-img-holder"></div></div></div>
+            </div>
+
+            <!-- FLOWER 3: CENTER MAIN FLOWER (DITO ANG TUNAY NA IMG TAG MO) -->
+            <div class="flower-container main f-center">
+                <div class="butterfly-box" id="b1"><div class="butterfly"><div class="wing left"></div><div class="wing right"></div></div></div>
+                <div class="butterfly-box" id="b2"><div class="butterfly"><div class="wing left"></div><div class="wing right"></div></div></div>
+                <div class="butterfly-box" id="b3"><div class="butterfly"><div class="wing left"></div><div class="wing right"></div></div></div>
+
+                <div class="stem">
+                    <div class="leaf left"></div><div class="leaf right"></div>
+                    <div class="flower-head">
+                        <div class="petals">
+                            <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
+                        </div>
+                        
+                        <!-- Gitna ng Petals: Ginamitan ng totoong <img> tag gaya ng gusto mo -->
+                        <div class="center-img-holder">
+                            <!-- Larawan sa Gitna: Palitan mo lang ang 'MUKHA_MO_DITO.jpg' ng pangalan ng file mo -->
+                            <img src="pey_flower.jpg" alt="pey">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- FLOWER 4 (Inner Right) -->
+            <div class="flower-container side f-right1">
+                <div class="stem"><div class="leaf left"></div><div class="leaf right"></div><div class="flower-head"><div class="petals"><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div></div><div class="center-img-holder"></div></div></div>
+            </div>
+
+            <!-- FLOWER 5 (Outer Right) -->
+            <div class="flower-container side outer f-right2">
+                <div class="stem"><div class="leaf left"></div><div class="leaf right"></div><div class="flower-head"><div class="petals"><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div></div><div class="center-img-holder"></div></div></div>
+            </div>
+
+        </div>
+
+        <div class="soil-container">
+            <div class="grass-layer back" id="backGrass"></div>
+            <div class="soil"></div>
+            <div class="grass-layer front" id="frontGrass"></div>
+        </div>
+    </div>
+
+    <script>
+        const overlay = document.getElementById('welcomeOverlay');
+        const audioPlayer = document.getElementById('bgMusic');
+        const mainContainer = document.querySelector('.flower-container.main');
+        const butterflies = document.querySelectorAll('.butterfly-box');
+
+        function generateGrass() {
+            const backG = document.getElementById('backGrass');
+            const frontG = document.getElementById('frontGrass');
+            for (let i = 0; i < 38; i++) {
+                backG.appendChild(document.createElement('div')).classList.add('grass');
+                frontG.appendChild(document.createElement('div')).classList.add('grass');
+            }
+        }
+        generateGrass();
+
+        function startGarden() {
+            audioPlayer.play().catch(e => console.log("Audio unlock active"));
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.visibility = 'hidden';
+                document.body.classList.add('loaded');
+                initMagicEffects();
+            }, 800);
+        }
+
+        function initMagicEffects() {
+            setTimeout(() => {
+                butterflies.forEach(b => b.style.opacity = "1");
+                setInterval(() => {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    const size = Math.random() * 4 + 2;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    const randomX = Math.random() * 70 - 35; 
+                    particle.style.left = `calc(50% + ${randomX}px)`;
+                    particle.style.top = `50px`; 
+                    particle.style.animation = `particle-rise ${Math.random() * 1.5 + 1.2}s ease-out forwards`;
+                    
+                    const colors = ['#ffffff', '#ff9ff3', '#ffe49e', '#00d2d3'];
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.boxShadow = `0 0 6px ${particle.style.background}`;
+                    
+                    mainContainer.appendChild(particle);
+                    setTimeout(() => { particle.remove(); }, 2500);
+                }, 350);
+            }, 3800);
+        }
+    </script>
+</body>
+</html>
